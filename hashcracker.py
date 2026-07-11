@@ -6,6 +6,7 @@ import time
 import itertools
 import hashlib
 import threading
+import queue
 import argparse
 
 ASCII_ART = r"""
@@ -142,8 +143,15 @@ def multi_threaded_brute_force(target_hash, prefix, max_len, charset, hash_type,
     
     def worker():
         while not stop_event.is_set():
+            # Get current length to process
             try:
-                length, combo = next(combo_iterator)
+                length = length_queue.get_nowait()
+            except queue.Empty:
+                break
+            
+            for combo in itertools.product(charset, repeat=length - len(prefix)):
+                if stop_event.is_set():
+                    break
                 word = prefix + ''.join(combo)
                 counter.increment()
                 
@@ -151,17 +159,14 @@ def multi_threaded_brute_force(target_hash, prefix, max_len, charset, hash_type,
                     stop_event.set()
                     result_holder['result'] = word
                     result_holder['elapsed'] = time.time() - start_time
-            except StopIteration:
-                break
+            
+            length_queue.task_done()
     
-    # Create all combinations
-    all_combos = []
+    # Create queue of lengths to process
+    length_queue = queue.Queue()
     prefix_len = len(prefix)
     for length in range(prefix_len, max_len + 1):
-        for combo in itertools.product(charset, repeat=length - prefix_len):
-            all_combos.append((length, combo))
-    
-    combo_iterator = iter(all_combos)
+        length_queue.put(length)
     
     # Start threads
     threads = []
