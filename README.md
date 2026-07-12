@@ -4,7 +4,7 @@ A minimalistic CLI open-source free Python-based hash cracking tool that support
 
 ## Description
 
-HashCracker is a command-line utility designed for educational and security testing purposes. It can crack various hash types including MD5, SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512 using brute force, wordlist attacks, or a built-in rainbow table of common passwords.
+HashCracker is a CLI tool designed for testing security. It can crack various hash types including MD5, SHA-1, SHA-224, SHA-256, SHA-384, and SHA-512 using brute force, wordlist attacks, or a built-in rainbow table of common passwords.
 
 ## Features
 
